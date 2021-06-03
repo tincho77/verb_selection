@@ -51,19 +51,22 @@ class DatabaseHelper {
 
   // SQL code to create the database table
   Future _onCreate(Database db, int version) async {
+
     await db.execute('''
           CREATE TABLE $listVerbs (
-            $columnIdListVerbs INTEGER PRIMARY KEY,
+            $columnIdListVerbs INTEGER NOT NULL,
             $columnLetterListVerbs TEXT NOT NULL,
+            PRIMARY KEY($columnIdListVerbs AUTOINCREMENT)
           )
           ''');
 
     await db.execute('''
           CREATE TABLE $verbs (
-            $columnIdVerbs INTEGER PRIMARY KEY,
+            $columnIdVerbs INTEGER NOT NULL,
             $columnDescriptionVerbs TEXT NOT NULL,
             $columnUsesVerbs REAL NOT NULL,
             $columnFkIdLetterVerbs INTEGER NOT NULL,
+            PRIMARY KEY($columnIdVerbs AUTOINCREMENT),
             FOREIGN KEY($columnFkIdLetterVerbs) 
             REFERENCES $listVerbs($columnIdListVerbs)
           )
@@ -71,18 +74,20 @@ class DatabaseHelper {
 
     await db.execute('''
           CREATE TABLE $pronouns (
-            $columnIdPronouns INTEGER PRIMARY KEY,
+            $columnIdPronouns INTEGER NOT NULL,
             $columnDescriptionPronouns TEXT NOT NULL,
             $columnUsesPronouns REAL NOT NULL,
+            PRIMARY KEY($columnIdPronouns AUTOINCREMENT)
           )
           ''');
 
     await db.execute('''
           CREATE TABLE $phrases (
-            $columnIdPhrases INTEGER PRIMARY KEY,
+            $columnIdPhrases INTEGER NOT NULL,
             $columnPhrase TEXT NOT NULL,
             $columnFkIdPronoun REAL NOT NULL,
             $columnFkIdVerb REAL NOT NULL,
+            PRIMARY KEY($columnIdPhrases AUTOINCREMENT),
             FOREIGN KEY($columnFkIdPronoun) 
             REFERENCES $pronouns($columnIdPronouns),
             FOREIGN KEY($columnFkIdVerb) 
