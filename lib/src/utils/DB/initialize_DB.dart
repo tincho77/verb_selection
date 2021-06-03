@@ -37,12 +37,12 @@ class DatabaseHelper {
   Future<Database> get database async {
     if (_database != null) return _database;
     // lazily instantiate the db the first time it is accessed
-    _database = await _initDatabase();
+    _database = await initDatabase();
     return _database;
   }
 
   // this opens the database (and creates it if it doesn't exist)
-  _initDatabase() async {
+  initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, _databaseName);
     return await openDatabase(path,
@@ -52,6 +52,13 @@ class DatabaseHelper {
   // SQL code to create the database table
   Future _onCreate(Database db, int version) async {
     await db.execute('''
+          CREATE TABLE $listVerbs (
+            $columnIdListVerbs INTEGER PRIMARY KEY,
+            $columnLetterListVerbs TEXT NOT NULL,
+          )
+          ''');
+
+    await db.execute('''
           CREATE TABLE $verbs (
             $columnIdVerbs INTEGER PRIMARY KEY,
             $columnDescriptionVerbs TEXT NOT NULL,
@@ -59,13 +66,6 @@ class DatabaseHelper {
             $columnFkIdLetterVerbs INTEGER NOT NULL,
             FOREIGN KEY($columnFkIdLetterVerbs) 
             REFERENCES $listVerbs($columnIdListVerbs)
-          )
-          ''');
-
-    await db.execute('''
-          CREATE TABLE $listVerbs (
-            $columnIdListVerbs INTEGER PRIMARY KEY,
-            $columnLetterListVerbs TEXT NOT NULL,
           )
           ''');
 
