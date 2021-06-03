@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -51,7 +50,6 @@ class DatabaseHelper {
 
   // SQL code to create the database table
   Future _onCreate(Database db, int version) async {
-
     await db.execute('''
           CREATE TABLE $listVerbs (
             $columnIdListVerbs INTEGER NOT NULL,
@@ -64,7 +62,7 @@ class DatabaseHelper {
           CREATE TABLE $verbs (
             $columnIdVerbs INTEGER NOT NULL,
             $columnDescriptionVerbs TEXT NOT NULL,
-            $columnUsesVerbs REAL NOT NULL,
+            $columnUsesVerbs INTEGER NOT NULL,
             $columnFkIdLetterVerbs INTEGER NOT NULL,
             PRIMARY KEY($columnIdVerbs AUTOINCREMENT),
             FOREIGN KEY($columnFkIdLetterVerbs) 
@@ -76,7 +74,7 @@ class DatabaseHelper {
           CREATE TABLE $pronouns (
             $columnIdPronouns INTEGER NOT NULL,
             $columnDescriptionPronouns TEXT NOT NULL,
-            $columnUsesPronouns REAL NOT NULL,
+            $columnUsesPronouns INTEGER NOT NULL,
             PRIMARY KEY($columnIdPronouns AUTOINCREMENT)
           )
           ''');
@@ -85,8 +83,8 @@ class DatabaseHelper {
           CREATE TABLE $phrases (
             $columnIdPhrases INTEGER NOT NULL,
             $columnPhrase TEXT NOT NULL,
-            $columnFkIdPronoun REAL NOT NULL,
-            $columnFkIdVerb REAL NOT NULL,
+            $columnFkIdPronoun INTEGER NOT NULL,
+            $columnFkIdVerb INTEGER NOT NULL,
             PRIMARY KEY($columnIdPhrases AUTOINCREMENT),
             FOREIGN KEY($columnFkIdPronoun) 
             REFERENCES $pronouns($columnIdPronouns),
@@ -185,5 +183,34 @@ class DatabaseHelper {
     Database db = await instance.database;
     return await db
         .delete(verbs, where: '$columnIdPronouns = ?', whereArgs: [id]);
+  }
+
+  // ------------------------ Consultas SQL -------------------------------
+
+  Future<List<Map<String, dynamic>>> queryMostUsedVerbs() async {
+    Database db = await instance.database;
+
+    List<Map> listMostUsedVerbs = await db.rawQuery(
+        '''SELECT $columnUsesVerbs, $columnIdVerbs, $columnDescriptionVerbs
+         FROM $verbs ORDER BY $columnUsesVerbs DESC LIMIT 6''');
+
+    print(listMostUsedVerbs);
+    return listMostUsedVerbs;
+  }
+
+  Future<List<Map<String, dynamic>>> queryAllPronouns() async {
+    Database db = await instance.database;
+
+    List<Map> listPronouns = await db.rawQuery(
+        '''SELECT $columnUsesPronouns, $columnIdPronouns, $columnDescriptionPronouns
+         FROM $pronouns LIMIT 9''');
+
+    print(listPronouns);
+    return listPronouns;
+  }
+
+  Future dbClose() async {
+    Database db = await instance.database;
+    await db.close();
   }
 }
