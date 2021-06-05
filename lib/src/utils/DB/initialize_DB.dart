@@ -3,6 +3,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 
+
 class DatabaseHelper {
   static final _databaseName = "abaton.db";
   static final _databaseVersion = 1;
@@ -43,6 +44,7 @@ class DatabaseHelper {
   // this opens the database (and creates it if it doesn't exist)
   initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    print('DB location: ' + documentsDirectory.path);
     String path = join(documentsDirectory.path, _databaseName);
     return await openDatabase(path,
         version: _databaseVersion, onCreate: _onCreate);
@@ -187,15 +189,20 @@ class DatabaseHelper {
 
   // ------------------------ Consultas SQL -------------------------------
 
-  Future<List<Map<String, dynamic>>> queryMostUsedVerbs() async {
+  Future<dynamic> queryMostUsedVerbs() async {
     Database db = await instance.database;
 
-    List<Map> listMostUsedVerbs = await db.rawQuery(
+    var result = await db.rawQuery(
         '''SELECT $columnUsesVerbs, $columnIdVerbs, $columnDescriptionVerbs
          FROM $verbs ORDER BY $columnUsesVerbs DESC LIMIT 6''');
 
-    print(listMostUsedVerbs);
-    return listMostUsedVerbs;
+    if(result.length == 0)
+      return null;
+    else{
+      var resultMap = result.toList();
+      //print(resultMap);
+      return resultMap.isNotEmpty ? resultMap : Null;
+    }
   }
 
   Future<List<Map<String, dynamic>>> queryAllPronouns() async {
