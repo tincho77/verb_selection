@@ -15,11 +15,12 @@ class MyApp extends StatelessWidget {
       title: 'Irregular Verbs',
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
-      routes: getAplicationRoutes(),
+       home: HomePage()
+      /*routes: getAplicationRoutes(),
       onGenerateRoute: (RouteSettings settings) {
         print('ruta llamada: ${settings.name}');
         return MaterialPageRoute(builder: (BuildContext context) => HomePage());
-      },
+      },*/
     );
   }
 }
