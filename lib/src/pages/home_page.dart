@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:verb_selection/src/utils/DB/initialize_DB.dart';
 import 'package:verb_selection/src/utils/verb_card.dart';
 
-// reference to our single class that manages the database
-class HomePage extends StatelessWidget {
+
+class HomePage extends StatefulWidget {
+  @override
+  _HomePage createState() => _HomePage();
+}
+
+class _HomePage extends State<HomePage> {
   final dbHelper = DatabaseHelper.instance;
   @override
   Widget build(BuildContext context) {
@@ -12,7 +17,7 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Irregular Verbs'),
       ),
-      body: verbCard(),
+      body: verbCard(context),
     );
   }
 }
